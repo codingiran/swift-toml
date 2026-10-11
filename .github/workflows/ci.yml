@@ -53,6 +53,23 @@ jobs:
       - name: Test
         run: make test
 
+      - name: Toolchain compatibility checks
+        run: swift run --package-path Tests/Compatibility
+
+  compatibility-swift510:
+    name: Swift 5.10 compatibility
+    runs-on: ubuntu-latest
+    container: swift:5.10-jammy
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build library in Swift 5 mode
+        run: swift build
+      - name: Run compatibility checks without Swift Testing
+        run: swift run --package-path Tests/Compatibility
+      - name: Build TOML compliance harness
+        run: swift build --package-path Tests/Integration
+
   test-linux:
     name: Swift ${{ matrix.swift-version }} on Linux
     runs-on: ubuntu-latest

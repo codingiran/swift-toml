@@ -424,16 +424,16 @@ final class _TOMLEncoder: Encoder {
 
 private extension _TOMLEncoder {
     func box(_ value: Bool) -> TOMLValue { .boolean(value) }
-    func box(_ value: Int) -> TOMLValue { .integer(Int64(value)) }
-    func box(_ value: Int8) -> TOMLValue { .integer(Int64(value)) }
-    func box(_ value: Int16) -> TOMLValue { .integer(Int64(value)) }
-    func box(_ value: Int32) -> TOMLValue { .integer(Int64(value)) }
+    func box(_ value: Int) throws -> TOMLValue { .integer(try encodeTOMLInteger(value, codingPath: codingPath)) }
+    func box(_ value: Int8) throws -> TOMLValue { .integer(try encodeTOMLInteger(value, codingPath: codingPath)) }
+    func box(_ value: Int16) throws -> TOMLValue { .integer(try encodeTOMLInteger(value, codingPath: codingPath)) }
+    func box(_ value: Int32) throws -> TOMLValue { .integer(try encodeTOMLInteger(value, codingPath: codingPath)) }
     func box(_ value: Int64) -> TOMLValue { .integer(value) }
-    func box(_ value: UInt) -> TOMLValue { .integer(Int64(value)) }
-    func box(_ value: UInt8) -> TOMLValue { .integer(Int64(value)) }
-    func box(_ value: UInt16) -> TOMLValue { .integer(Int64(value)) }
-    func box(_ value: UInt32) -> TOMLValue { .integer(Int64(value)) }
-    func box(_ value: UInt64) -> TOMLValue { .integer(Int64(value)) }
+    func box(_ value: UInt) throws -> TOMLValue { .integer(try encodeTOMLInteger(value, codingPath: codingPath)) }
+    func box(_ value: UInt8) throws -> TOMLValue { .integer(try encodeTOMLInteger(value, codingPath: codingPath)) }
+    func box(_ value: UInt16) throws -> TOMLValue { .integer(try encodeTOMLInteger(value, codingPath: codingPath)) }
+    func box(_ value: UInt32) throws -> TOMLValue { .integer(try encodeTOMLInteger(value, codingPath: codingPath)) }
+    func box(_ value: UInt64) throws -> TOMLValue { .integer(try encodeTOMLInteger(value, codingPath: codingPath)) }
     func box(_ value: Float) -> TOMLValue { .float(Double(value)) }
     func box(_ value: Double) -> TOMLValue { .float(value) }
     func box(_ value: String) -> TOMLValue { .string(value) }
@@ -487,7 +487,7 @@ private extension _TOMLEncoder {
         }
     }
 
-    func box<T: Encodable>(_ value: T) throws -> TOMLValue {
+    func box<T: Encodable>(_ value: T, codingPath: [any CodingKey]? = nil) throws -> TOMLValue {
         if let date = value as? Date {
             return box(date)
         }
@@ -501,14 +501,17 @@ private extension _TOMLEncoder {
             return .localTime(localTime)
         }
 
-        let encoder = _TOMLEncoder(codingPath: codingPath, userInfo: userInfo, options: options)
+        let encoder = _TOMLEncoder(codingPath: codingPath ?? self.codingPath, userInfo: userInfo, options: options)
         try value.encode(to: encoder)
 
         if let v = encoder.value {
             return v
         }
 
-        throw TOMLEncodingError.invalidValue("Unable to encode \(type(of: value))", codingPath: codingPath)
+        throw TOMLEncodingError.invalidValue(
+            "Unable to encode \(type(of: value))",
+            codingPath: codingPath ?? self.codingPath
+        )
     }
 
     func convertKey(_ key: any CodingKey) -> String {
@@ -568,19 +571,19 @@ private struct TOMLKeyedEncodingContainer<Key: CodingKey>: KeyedEncodingContaine
     }
 
     mutating func encode(_ value: Int, forKey key: Key) throws {
-        set(.integer(Int64(value)), forKey: key)
+        set(.integer(try encodeTOMLInteger(value, codingPath: codingPath + [key])), forKey: key)
     }
 
     mutating func encode(_ value: Int8, forKey key: Key) throws {
-        set(.integer(Int64(value)), forKey: key)
+        set(.integer(try encodeTOMLInteger(value, codingPath: codingPath + [key])), forKey: key)
     }
 
     mutating func encode(_ value: Int16, forKey key: Key) throws {
-        set(.integer(Int64(value)), forKey: key)
+        set(.integer(try encodeTOMLInteger(value, codingPath: codingPath + [key])), forKey: key)
     }
 
     mutating func encode(_ value: Int32, forKey key: Key) throws {
-        set(.integer(Int64(value)), forKey: key)
+        set(.integer(try encodeTOMLInteger(value, codingPath: codingPath + [key])), forKey: key)
     }
 
     mutating func encode(_ value: Int64, forKey key: Key) throws {
@@ -588,27 +591,27 @@ private struct TOMLKeyedEncodingContainer<Key: CodingKey>: KeyedEncodingContaine
     }
 
     mutating func encode(_ value: UInt, forKey key: Key) throws {
-        set(.integer(Int64(value)), forKey: key)
+        set(.integer(try encodeTOMLInteger(value, codingPath: codingPath + [key])), forKey: key)
     }
 
     mutating func encode(_ value: UInt8, forKey key: Key) throws {
-        set(.integer(Int64(value)), forKey: key)
+        set(.integer(try encodeTOMLInteger(value, codingPath: codingPath + [key])), forKey: key)
     }
 
     mutating func encode(_ value: UInt16, forKey key: Key) throws {
-        set(.integer(Int64(value)), forKey: key)
+        set(.integer(try encodeTOMLInteger(value, codingPath: codingPath + [key])), forKey: key)
     }
 
     mutating func encode(_ value: UInt32, forKey key: Key) throws {
-        set(.integer(Int64(value)), forKey: key)
+        set(.integer(try encodeTOMLInteger(value, codingPath: codingPath + [key])), forKey: key)
     }
 
     mutating func encode(_ value: UInt64, forKey key: Key) throws {
-        set(.integer(Int64(value)), forKey: key)
+        set(.integer(try encodeTOMLInteger(value, codingPath: codingPath + [key])), forKey: key)
     }
 
     mutating func encode<T: Encodable>(_ value: T, forKey key: Key) throws {
-        let boxed = try encoder.box(value)
+        let boxed = try encoder.box(value, codingPath: codingPath + [key])
         set(boxed, forKey: key)
     }
 
@@ -684,19 +687,19 @@ private struct TOMLUnkeyedEncodingContainer: UnkeyedEncodingContainer {
     }
 
     mutating func encode(_ value: Int) throws {
-        append(.integer(Int64(value)))
+        append(.integer(try encodeTOMLInteger(value, codingPath: codingPath + [TOMLCodingKey(index: count)])))
     }
 
     mutating func encode(_ value: Int8) throws {
-        append(.integer(Int64(value)))
+        append(.integer(try encodeTOMLInteger(value, codingPath: codingPath + [TOMLCodingKey(index: count)])))
     }
 
     mutating func encode(_ value: Int16) throws {
-        append(.integer(Int64(value)))
+        append(.integer(try encodeTOMLInteger(value, codingPath: codingPath + [TOMLCodingKey(index: count)])))
     }
 
     mutating func encode(_ value: Int32) throws {
-        append(.integer(Int64(value)))
+        append(.integer(try encodeTOMLInteger(value, codingPath: codingPath + [TOMLCodingKey(index: count)])))
     }
 
     mutating func encode(_ value: Int64) throws {
@@ -704,27 +707,27 @@ private struct TOMLUnkeyedEncodingContainer: UnkeyedEncodingContainer {
     }
 
     mutating func encode(_ value: UInt) throws {
-        append(.integer(Int64(value)))
+        append(.integer(try encodeTOMLInteger(value, codingPath: codingPath + [TOMLCodingKey(index: count)])))
     }
 
     mutating func encode(_ value: UInt8) throws {
-        append(.integer(Int64(value)))
+        append(.integer(try encodeTOMLInteger(value, codingPath: codingPath + [TOMLCodingKey(index: count)])))
     }
 
     mutating func encode(_ value: UInt16) throws {
-        append(.integer(Int64(value)))
+        append(.integer(try encodeTOMLInteger(value, codingPath: codingPath + [TOMLCodingKey(index: count)])))
     }
 
     mutating func encode(_ value: UInt32) throws {
-        append(.integer(Int64(value)))
+        append(.integer(try encodeTOMLInteger(value, codingPath: codingPath + [TOMLCodingKey(index: count)])))
     }
 
     mutating func encode(_ value: UInt64) throws {
-        append(.integer(Int64(value)))
+        append(.integer(try encodeTOMLInteger(value, codingPath: codingPath + [TOMLCodingKey(index: count)])))
     }
 
     mutating func encode<T: Encodable>(_ value: T) throws {
-        let boxed = try encoder.box(value)
+        let boxed = try encoder.box(value, codingPath: codingPath + [TOMLCodingKey(index: count)])
         append(boxed)
     }
 
@@ -788,19 +791,19 @@ private struct TOMLSingleValueEncodingContainer: SingleValueEncodingContainer {
     }
 
     mutating func encode(_ value: Int) throws {
-        encoder.setValue(.integer(Int64(value)))
+        encoder.setValue(.integer(try encodeTOMLInteger(value, codingPath: codingPath)))
     }
 
     mutating func encode(_ value: Int8) throws {
-        encoder.setValue(.integer(Int64(value)))
+        encoder.setValue(.integer(try encodeTOMLInteger(value, codingPath: codingPath)))
     }
 
     mutating func encode(_ value: Int16) throws {
-        encoder.setValue(.integer(Int64(value)))
+        encoder.setValue(.integer(try encodeTOMLInteger(value, codingPath: codingPath)))
     }
 
     mutating func encode(_ value: Int32) throws {
-        encoder.setValue(.integer(Int64(value)))
+        encoder.setValue(.integer(try encodeTOMLInteger(value, codingPath: codingPath)))
     }
 
     mutating func encode(_ value: Int64) throws {
@@ -808,23 +811,23 @@ private struct TOMLSingleValueEncodingContainer: SingleValueEncodingContainer {
     }
 
     mutating func encode(_ value: UInt) throws {
-        encoder.setValue(.integer(Int64(value)))
+        encoder.setValue(.integer(try encodeTOMLInteger(value, codingPath: codingPath)))
     }
 
     mutating func encode(_ value: UInt8) throws {
-        encoder.setValue(.integer(Int64(value)))
+        encoder.setValue(.integer(try encodeTOMLInteger(value, codingPath: codingPath)))
     }
 
     mutating func encode(_ value: UInt16) throws {
-        encoder.setValue(.integer(Int64(value)))
+        encoder.setValue(.integer(try encodeTOMLInteger(value, codingPath: codingPath)))
     }
 
     mutating func encode(_ value: UInt32) throws {
-        encoder.setValue(.integer(Int64(value)))
+        encoder.setValue(.integer(try encodeTOMLInteger(value, codingPath: codingPath)))
     }
 
     mutating func encode(_ value: UInt64) throws {
-        encoder.setValue(.integer(Int64(value)))
+        encoder.setValue(.integer(try encodeTOMLInteger(value, codingPath: codingPath)))
     }
 
     mutating func encode<T: Encodable>(_ value: T) throws {

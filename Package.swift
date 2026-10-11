@@ -37,5 +37,6 @@ let package = Package(
             dependencies: ["TOML"]
         ),
     ],
+    swiftLanguageModes: [.v6],
     cxxLanguageStandard: .cxx17
 )

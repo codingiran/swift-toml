@@ -27,7 +27,7 @@ for fast, spec-compliant parsing with full Swift Codable support.
 
 ## Requirements
 
-- Swift 6.0+ / Xcode 16+
+- Swift 5.10+ / Xcode 15.4+ (Swift Testing requires Swift 6.0+)
 - iOS 13.0+ / macOS 10.15+ / watchOS 6.0+ / tvOS 13.0+ / visionOS 1.0+
 
 ## Installation
@@ -38,7 +38,7 @@ Add the following to your `Package.swift` file:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/mattt/swift-toml.git", from: "2.0.0")
+    .package(url: "https://github.com/codingiran/swift-toml.git", exact: "2.0.1")
 ]
 ```
 
@@ -240,6 +240,23 @@ To check for updates without downloading:
 ```bash
 make check
 ```
+
+### Swift Toolchain Compatibility
+
+`Package.swift` uses Swift 6 mode and includes Swift Testing. Swift 5.10
+selects `Package@swift-5.10.swift`, uses Swift 5 mode, and builds the same
+library products without the Swift Testing target. Both manifests declare
+the same platforms and C++17 bridge. No C++ interoperability setting is needed.
+
+Run the standalone compatibility checks on either toolchain:
+
+```bash
+swift run --package-path Tests/Compatibility
+```
+
+Integer decoding rejects negative unsigned values and values outside the
+requested Swift type's range. Integer encoding rejects values above `Int64.max`,
+as required by TOML. These failures throw errors instead of trapping.
 
 ### Running Tests
 

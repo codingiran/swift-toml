@@ -560,19 +560,19 @@ private struct TOMLKeyedDecodingContainer<Key: CodingKey>: KeyedDecodingContaine
     }
 
     func decode(_ type: Int.Type, forKey key: Key) throws -> Int {
-        Int(try decode(Int64.self, forKey: key))
+        try decodeTOMLInteger(decode(Int64.self, forKey: key), as: type, codingPath: codingPath + [key])
     }
 
     func decode(_ type: Int8.Type, forKey key: Key) throws -> Int8 {
-        Int8(try decode(Int64.self, forKey: key))
+        try decodeTOMLInteger(decode(Int64.self, forKey: key), as: type, codingPath: codingPath + [key])
     }
 
     func decode(_ type: Int16.Type, forKey key: Key) throws -> Int16 {
-        Int16(try decode(Int64.self, forKey: key))
+        try decodeTOMLInteger(decode(Int64.self, forKey: key), as: type, codingPath: codingPath + [key])
     }
 
     func decode(_ type: Int32.Type, forKey key: Key) throws -> Int32 {
-        Int32(try decode(Int64.self, forKey: key))
+        try decodeTOMLInteger(decode(Int64.self, forKey: key), as: type, codingPath: codingPath + [key])
     }
 
     func decode(_ type: Int64.Type, forKey key: Key) throws -> Int64 {
@@ -584,23 +584,23 @@ private struct TOMLKeyedDecodingContainer<Key: CodingKey>: KeyedDecodingContaine
     }
 
     func decode(_ type: UInt.Type, forKey key: Key) throws -> UInt {
-        UInt(try decode(Int64.self, forKey: key))
+        try decodeTOMLInteger(decode(Int64.self, forKey: key), as: type, codingPath: codingPath + [key])
     }
 
     func decode(_ type: UInt8.Type, forKey key: Key) throws -> UInt8 {
-        UInt8(try decode(Int64.self, forKey: key))
+        try decodeTOMLInteger(decode(Int64.self, forKey: key), as: type, codingPath: codingPath + [key])
     }
 
     func decode(_ type: UInt16.Type, forKey key: Key) throws -> UInt16 {
-        UInt16(try decode(Int64.self, forKey: key))
+        try decodeTOMLInteger(decode(Int64.self, forKey: key), as: type, codingPath: codingPath + [key])
     }
 
     func decode(_ type: UInt32.Type, forKey key: Key) throws -> UInt32 {
-        UInt32(try decode(Int64.self, forKey: key))
+        try decodeTOMLInteger(decode(Int64.self, forKey: key), as: type, codingPath: codingPath + [key])
     }
 
     func decode(_ type: UInt64.Type, forKey key: Key) throws -> UInt64 {
-        UInt64(try decode(Int64.self, forKey: key))
+        try decodeTOMLInteger(decode(Int64.self, forKey: key), as: type, codingPath: codingPath + [key])
     }
 
     func decode<T: Decodable>(_ type: T.Type, forKey key: Key) throws -> T {
@@ -810,19 +810,35 @@ private struct TOMLUnkeyedDecodingContainer: UnkeyedDecodingContainer {
     }
 
     mutating func decode(_ type: Int.Type) throws -> Int {
-        Int(try decode(Int64.self))
+        try decodeTOMLInteger(
+            decode(Int64.self),
+            as: type,
+            codingPath: codingPath + [TOMLCodingKey(index: currentIndex - 1)]
+        )
     }
 
     mutating func decode(_ type: Int8.Type) throws -> Int8 {
-        Int8(try decode(Int64.self))
+        try decodeTOMLInteger(
+            decode(Int64.self),
+            as: type,
+            codingPath: codingPath + [TOMLCodingKey(index: currentIndex - 1)]
+        )
     }
 
     mutating func decode(_ type: Int16.Type) throws -> Int16 {
-        Int16(try decode(Int64.self))
+        try decodeTOMLInteger(
+            decode(Int64.self),
+            as: type,
+            codingPath: codingPath + [TOMLCodingKey(index: currentIndex - 1)]
+        )
     }
 
     mutating func decode(_ type: Int32.Type) throws -> Int32 {
-        Int32(try decode(Int64.self))
+        try decodeTOMLInteger(
+            decode(Int64.self),
+            as: type,
+            codingPath: codingPath + [TOMLCodingKey(index: currentIndex - 1)]
+        )
     }
 
     mutating func decode(_ type: Int64.Type) throws -> Int64 {
@@ -834,23 +850,43 @@ private struct TOMLUnkeyedDecodingContainer: UnkeyedDecodingContainer {
     }
 
     mutating func decode(_ type: UInt.Type) throws -> UInt {
-        UInt(try decode(Int64.self))
+        try decodeTOMLInteger(
+            decode(Int64.self),
+            as: type,
+            codingPath: codingPath + [TOMLCodingKey(index: currentIndex - 1)]
+        )
     }
 
     mutating func decode(_ type: UInt8.Type) throws -> UInt8 {
-        UInt8(try decode(Int64.self))
+        try decodeTOMLInteger(
+            decode(Int64.self),
+            as: type,
+            codingPath: codingPath + [TOMLCodingKey(index: currentIndex - 1)]
+        )
     }
 
     mutating func decode(_ type: UInt16.Type) throws -> UInt16 {
-        UInt16(try decode(Int64.self))
+        try decodeTOMLInteger(
+            decode(Int64.self),
+            as: type,
+            codingPath: codingPath + [TOMLCodingKey(index: currentIndex - 1)]
+        )
     }
 
     mutating func decode(_ type: UInt32.Type) throws -> UInt32 {
-        UInt32(try decode(Int64.self))
+        try decodeTOMLInteger(
+            decode(Int64.self),
+            as: type,
+            codingPath: codingPath + [TOMLCodingKey(index: currentIndex - 1)]
+        )
     }
 
     mutating func decode(_ type: UInt64.Type) throws -> UInt64 {
-        UInt64(try decode(Int64.self))
+        try decodeTOMLInteger(
+            decode(Int64.self),
+            as: type,
+            codingPath: codingPath + [TOMLCodingKey(index: currentIndex - 1)]
+        )
     }
 
     mutating func decode<T: Decodable>(_ type: T.Type) throws -> T {
@@ -1019,19 +1055,19 @@ private struct TOMLSingleValueDecodingContainer: SingleValueDecodingContainer {
     }
 
     func decode(_ type: Int.Type) throws -> Int {
-        Int(try decode(Int64.self))
+        try decodeTOMLInteger(decode(Int64.self), as: type, codingPath: codingPath)
     }
 
     func decode(_ type: Int8.Type) throws -> Int8 {
-        Int8(try decode(Int64.self))
+        try decodeTOMLInteger(decode(Int64.self), as: type, codingPath: codingPath)
     }
 
     func decode(_ type: Int16.Type) throws -> Int16 {
-        Int16(try decode(Int64.self))
+        try decodeTOMLInteger(decode(Int64.self), as: type, codingPath: codingPath)
     }
 
     func decode(_ type: Int32.Type) throws -> Int32 {
-        Int32(try decode(Int64.self))
+        try decodeTOMLInteger(decode(Int64.self), as: type, codingPath: codingPath)
     }
 
     func decode(_ type: Int64.Type) throws -> Int64 {
@@ -1042,23 +1078,23 @@ private struct TOMLSingleValueDecodingContainer: SingleValueDecodingContainer {
     }
 
     func decode(_ type: UInt.Type) throws -> UInt {
-        UInt(try decode(Int64.self))
+        try decodeTOMLInteger(decode(Int64.self), as: type, codingPath: codingPath)
     }
 
     func decode(_ type: UInt8.Type) throws -> UInt8 {
-        UInt8(try decode(Int64.self))
+        try decodeTOMLInteger(decode(Int64.self), as: type, codingPath: codingPath)
     }
 
     func decode(_ type: UInt16.Type) throws -> UInt16 {
-        UInt16(try decode(Int64.self))
+        try decodeTOMLInteger(decode(Int64.self), as: type, codingPath: codingPath)
     }
 
     func decode(_ type: UInt32.Type) throws -> UInt32 {
-        UInt32(try decode(Int64.self))
+        try decodeTOMLInteger(decode(Int64.self), as: type, codingPath: codingPath)
     }
 
     func decode(_ type: UInt64.Type) throws -> UInt64 {
-        UInt64(try decode(Int64.self))
+        try decodeTOMLInteger(decode(Int64.self), as: type, codingPath: codingPath)
     }
 
     func decode<T: Decodable>(_ type: T.Type) throws -> T {
